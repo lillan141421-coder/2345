@@ -601,7 +601,7 @@
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   }
 
-  function submitForm() {
+  async function submitForm() {
     const parentName = document.getElementById('parentName').value.trim();
     const phone = document.getElementById('phone').value.trim();
     const email = document.getElementById('email').value.trim();
@@ -617,11 +617,40 @@
     if (!dateVal) { alert('請選擇參加日期 📅'); return; }
     if (qtys.length === 0) { alert('請選擇預計製作數量 📿'); return; }
 
-    document.getElementById('confirmedEmail').textContent = email;
-    document.getElementById('formContent').style.display = 'none';
-    const s = document.getElementById('successScreen');
-    s.classList.add('show');
-    s.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const btn = document.querySelector('.submit-btn');
+    btn.textContent = '送出中...';
+    btn.disabled = true;
+
+    try {
+      const res = await fetch('https://formspree.io/f/mgoqybqp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          '家長姓名': parentName,
+          '聯絡電話': phone,
+          'email': email,
+          '小寶貝名字': childName,
+          '參加日期': dateVal.value,
+          '製作數量': qtys.map(q => q.value).join('、'),
+        })
+      });
+
+      if (res.ok) {
+        document.getElementById('confirmedEmail').textContent = email;
+        document.getElementById('formContent').style.display = 'none';
+        const s = document.getElementById('successScreen');
+        s.classList.add('show');
+        s.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        alert('送出失敗，請稍後再試 😢');
+        btn.innerHTML = '<span class="btn-icon">🎀</span> 立即預約報名！ <span class="btn-icon">✨</span>';
+        btn.disabled = false;
+      }
+    } catch(e) {
+      alert('網路錯誤，請確認網路連線後再試 😢');
+      btn.innerHTML = '<span class="btn-icon">🎀</span> 立即預約報名！ <span class="btn-icon">✨</span>';
+      btn.disabled = false;
+    }
   }
 </script>
 </body>
