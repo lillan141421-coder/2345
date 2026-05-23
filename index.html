@@ -626,17 +626,18 @@
     btn.disabled = true;
 
     try {
+      const formData = new FormData();
+      formData.append('家長姓名', parentName);
+      formData.append('聯絡電話', phone);
+      formData.append('email', email);
+      formData.append('小寶貝名字', childName);
+      formData.append('參加日期', dateVal.value);
+      formData.append('製作數量', qtys.map(q => q.value).join('、'));
+
       const res = await fetch('https://formspree.io/f/mgoqybqp', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({
-          '家長姓名': parentName,
-          '聯絡電話': phone,
-          'email': email,
-          '小寶貝名字': childName,
-          '參加日期': dateVal.value,
-          '製作數量': qtys.map(q => q.value).join('、'),
-        })
+        headers: { 'Accept': 'application/json' },
+        body: formData
       });
 
       if (res.ok) {
