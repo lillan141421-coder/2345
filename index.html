@@ -625,6 +625,13 @@
     btn.textContent = '送出中...';
     btn.disabled = true;
 
+    // 先跳出成功畫面
+    document.getElementById('formContent').style.display = 'none';
+    const s = document.getElementById('successScreen');
+    s.classList.add('show');
+    s.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    // 背景送出資料到 Formspree
     try {
       const formData = new FormData();
       formData.append('家長姓名', parentName);
@@ -633,28 +640,13 @@
       formData.append('小寶貝名字', childName);
       formData.append('參加日期', dateVal.value);
       formData.append('製作數量', qtys.map(q => q.value).join('、'));
-
-      const res = await fetch('https://formspree.io/f/mgoqybqp', {
+      await fetch('https://formspree.io/f/mgoqybqp', {
         method: 'POST',
         headers: { 'Accept': 'application/json' },
         body: formData
       });
-
-      if (res.ok) {
-        document.getElementById('confirmedEmail').textContent = email;
-        document.getElementById('formContent').style.display = 'none';
-        const s = document.getElementById('successScreen');
-        s.classList.add('show');
-        s.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      } else {
-        alert('送出失敗，請稍後再試 😢');
-        btn.innerHTML = '<span class="btn-icon">🎀</span> 立即預約報名！ <span class="btn-icon">✨</span>';
-        btn.disabled = false;
-      }
     } catch(e) {
-      alert('網路錯誤，請確認網路連線後再試 😢');
-      btn.innerHTML = '<span class="btn-icon">🎀</span> 立即預約報名！ <span class="btn-icon">✨</span>';
-      btn.disabled = false;
+      // 靜默處理，不影響使用者體驗
     }
   }
 </script>
